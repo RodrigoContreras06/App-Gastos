@@ -29,6 +29,21 @@
 
             <!-- ================= PANTALLA 1: INICIO & REGISTRO ================= -->
             <div id="pantalla-inicio" class="space-y-6">
+                
+                <!-- TABLERO DE BALANCE MENSUAL (RESTA EN DINERO) -->
+                <section id="panel-balance" class="p-5 rounded-2xl border transition-all duration-300 text-center shadow-sm">
+                    <span class="text-xs font-bold uppercase tracking-wider block mb-1 text-slate-500" id="lbl-balance">Disponible Restante (Mes)</span>
+                    <span id="txt-balance" class="text-3xl font-extrabold block">$0</span>
+                    
+                    <!-- Pequeña barra de estado rápida -->
+                    <div class="flex justify-center items-center gap-2 mt-3 text-xs font-semibold">
+                        <span id="badge-estado" class="px-2.5 py-1 rounded-full">Calculando...</span>
+                        <button onclick="diagnosticarSaludFinanciera()" class="text-teal-600 hover:underline flex items-center gap-1 ml-1 text-[11px]">
+                            <i data-lucide="activity" class="w-3 h-3"></i> Evaluar Estado
+                        </button>
+                    </div>
+                </section>
+
                 <!-- AJUSTE DE PRESUPUESTO & PORCENTAJES -->
                 <section class="bg-slate-50 p-4 rounded-2xl border border-slate-100 shadow-sm space-y-4">
                     <div class="flex justify-between items-center border-b pb-2">
@@ -41,15 +56,15 @@
                     <div class="grid grid-cols-3 gap-2 text-center">
                         <div class="p-2 bg-white rounded-lg border">
                             <span class="text-[10px] text-slate-400 font-bold block">Ingreso</span>
-                            <span id="txt-ingreso" class="text-sm font-bold text-slate-800">$0</span>
+                            <span id="txt-ingreso" class="text-xs font-bold text-slate-800">$0</span>
                         </div>
                         <div class="p-2 bg-white rounded-lg border">
                             <span class="text-[10px] text-blue-500 font-bold block" id="lbl-pct-nec">Necesidad (50%)</span>
-                            <span id="txt-limite-nec" class="text-sm font-bold text-blue-600">$0</span>
+                            <span id="txt-limite-nec" class="text-xs font-bold text-blue-600">$0</span>
                         </div>
                         <div class="p-2 bg-white rounded-lg border">
                             <span class="text-[10px] text-orange-500 font-bold block" id="lbl-pct-des">Deseos (30%)</span>
-                            <span id="txt-limite-des" class="text-sm font-bold text-orange-600">$0</span>
+                            <span id="txt-limite-des" class="text-xs font-bold text-orange-600">$0</span>
                         </div>
                     </div>
 
@@ -141,7 +156,7 @@
 
             <!-- ================= PANTALLA 3: HISTORIAL DETALLADO ================= -->
             <div id="pantalla-historial" class="space-y-4 hidden">
-                <!-- CABECERA HISTORIAL CON FILTROS -->
+                <!-- CABECERA HISTORIAL WITH FILTERS -->
                 <div class="flex flex-col gap-2">
                     <div class="flex justify-between items-center">
                         <h2 class="text-md font-bold text-slate-700 flex items-center gap-1">
@@ -221,11 +236,11 @@
     <!-- MODAL 2: ALERTAS GENERALES -->
     <div id="modal-alerta" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-6 max-w-xs w-full text-center shadow-2xl space-y-4">
-            <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto">
-                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+            <div id="modal-alerta-icon-box" class="w-12 h-12 rounded-full flex items-center justify-center mx-auto">
+                <i id="modal-alerta-icon" data-lucide="alert-triangle" class="w-6 h-6"></i>
             </div>
-            <h3 id="modal-titulo" class="text-lg font-bold text-slate-800">Alerta de Límite</h3>
-            <p id="modal-mensaje" class="text-slate-600 text-sm">Has alcanzado tu límite de gasto.</p>
+            <h3 id="modal-titulo" class="text-lg font-bold text-slate-800">Alerta</h3>
+            <p id="modal-mensaje" class="text-slate-600 text-sm">Mensaje.</p>
             <button onclick="cerrarModal()" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-2.5 rounded-lg text-sm font-semibold transition-colors">
                 Entendido
             </button>
@@ -338,6 +353,46 @@
             const limiteDes = config.ingreso * (config.pctDeseos / 100);
             const metaAhorro = config.ingreso * (config.pctAhorro / 100);
 
+            // Calcular gastos totales de este mes para el balance disponible
+            let totalGastadoMes = 0;
+            const ahora = new Date();
+            listaGastos.forEach(g => {
+                const f = new Date(g.fecha);
+                if (f.getMonth() === ahora.getMonth() && f.getFullYear() === ahora.getFullYear()) {
+                    totalGastadoMes += g.monto;
+                }
+            });
+
+            // Disponible real del mes = Ingreso - Meta Ahorro - Gastos Realizados
+            const disponibleRestante = config.ingreso - metaAhorro - totalGastadoMes;
+
+            // UI del Balance
+            const panelBalance = document.getElementById('panel-balance');
+            const txtBalance = document.getElementById('txt-balance');
+            const badgeEstado = document.getElementById('badge-estado');
+
+            txtBalance.innerText = formatoMoneda.format(disponibleRestante);
+
+            if (disponibleRestante < 0) {
+                // Sobregirado (Rojo)
+                panelBalance.className = "p-5 rounded-2xl border border-red-200 bg-red-50 text-center shadow-sm";
+                txtBalance.className = "text-3xl font-extrabold block text-red-600";
+                badgeEstado.innerText = "SOBREGIRADO / NÚMEROS ROJOS ⚠️";
+                badgeEstado.className = "px-2.5 py-1 rounded-full bg-red-200 text-red-800 text-[10px]";
+            } else if (disponibleRestante === 0) {
+                // Sin fondos
+                panelBalance.className = "p-5 rounded-2xl border border-slate-200 bg-slate-50 text-center shadow-sm";
+                txtBalance.className = "text-3xl font-extrabold block text-slate-800";
+                badgeEstado.innerText = "Límite Alcanzado (Saldo en cero)";
+                badgeEstado.className = "px-2.5 py-1 rounded-full bg-slate-200 text-slate-700 text-[10px]";
+            } else {
+                // Positivo (Verde)
+                panelBalance.className = "p-5 rounded-2xl border border-emerald-100 bg-emerald-50/50 text-center shadow-sm";
+                txtBalance.className = "text-3xl font-extrabold block text-emerald-600";
+                badgeEstado.innerText = "Saldo Positivo ✔️";
+                badgeEstado.className = "px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[10px]";
+            }
+
             document.getElementById('txt-ingreso').innerText = formatoMoneda.format(config.ingreso);
             document.getElementById('txt-limite-nec').innerText = formatoMoneda.format(limiteNec);
             document.getElementById('txt-limite-des').innerText = formatoMoneda.format(limiteDes);
@@ -345,7 +400,48 @@
 
             document.getElementById('lbl-pct-nec').innerText = `Necesidad (${config.pctNecesidades}%)`;
             document.getElementById('lbl-pct-des').innerText = `Deseos (${config.pctDeseos}%)`;
-            document.getElementById('lbl-pct-aho').innerText = `Meta de Ahorro (${config.pctAhorro}%)`;
+            document.getElementById('lbl-pct-aho').innerText = `Ahorro (${config.pctAhorro}%)`;
+        }
+
+        // EVALUACIÓN DE SALUD FINANCIERA (DIAGNÓSTICO)
+        function diagnosticarSaludFinanciera() {
+            const ahora = new Date();
+            const diaDelMes = ahora.getDate();
+            const totalDias = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0).getDate();
+            const porcentajeMesTranscurrido = (diaDelMes / totalDias) * 100;
+
+            const metaAhorro = config.ingreso * (config.pctAhorro / 100);
+            
+            let totalGastadoMes = 0;
+            listaGastos.forEach(g => {
+                const f = new Date(g.fecha);
+                if (f.getMonth() === ahora.getMonth() && f.getFullYear() === ahora.getFullYear()) {
+                    totalGastadoMes += g.monto;
+                }
+            });
+
+            const presupuestoGastable = config.ingreso - metaAhorro;
+            const porcentajeGastoRealizado = (totalGastadoMes / presupuestoGastable) * 100;
+
+            let titulo = "";
+            let mensaje = "";
+            let tipoColor = "verde"; // verde, amarillo, rojo
+
+            if (porcentajeGastoRealizado > 100) {
+                tipoColor = "rojo";
+                titulo = "¡Alerta: Sobregiro Financiero!";
+                mensaje = `Te has pasado de tu presupuesto disponible por ${formatoMoneda.format(totalGastadoMes - presupuestoGastable)}. Estás tocando tu fondo de ahorro o acumulando deudas. ¡Detén los gastos no esenciales de inmediato!`;
+            } else if (porcentajeGastoRealizado > porcentajeMesTranscurrido + 15) {
+                tipoColor = "amarillo";
+                titulo = "Vas muy rápido en el mes";
+                mensaje = `Hoy es el día ${diaDelMes} del mes (${Math.round(porcentajeMesTranscurrido)}% transcurrido), pero ya has gastado el ${Math.round(porcentajeGastoRealizado)}% de tu presupuesto. Intenta disminuir el ritmo de tus gastos de Deseos para no quedarte sin saldo antes de que acabe el mes.`;
+            } else {
+                tipoColor = "verde";
+                titulo = "¡Excelente control del mes!";
+                mensaje = `Vas muy bien. El mes va en el ${Math.round(porcentajeMesTranscurrido)}% y tu consumo de presupuesto es de apenas el ${Math.round(porcentajeGastoRealizado)}%. Sigue así y es muy probable que acumules un extra para tu ahorro este mes.`;
+            }
+
+            lanzarAlertaModalConfigurada(titulo, mensaje, tipoColor);
         }
 
         // AGREGAR GASTOS
@@ -396,33 +492,32 @@
             const pctAnterior = (acumuladoGrupoMes / limiteDelMes) * 100;
             const pctActual = ((acumuladoGrupoMes + monto) / limiteDelMes) * 100;
 
+            actualizarValoresUI();
+
             if (pctAnterior < 80 && pctActual >= 80 && pctActual < 100) {
-                lanzarAlerta("¡Atención (80%)!", `Tu gasto mensual en ${grupo}s ya superó el 80% de tu límite asignado.`);
+                lanzarAlertaModalConfigurada("¡Atención (80%)!", `Tu gasto mensual en ${grupo}s ya superó el 80% de tu límite asignado.`, "amarillo");
             } else if (pctAnterior < 100 && pctActual >= 100) {
-                lanzarAlerta("¡Límite Superado!", `Has gastado más del 100% de tu presupuesto mensual para ${grupo}s.`);
+                lanzarAlertaModalConfigurada("¡Límite Superado!", `Has gastado más del 100% de tu presupuesto mensual para ${grupo}s.`, "rojo");
             } else {
                 alert("Gasto guardado correctamente.");
             }
         }
 
         // FILTROS TEMPORALES DE FECHA
-        function perteneceAPeriodo(fechaISO, periodo) {
+        function pertenceAPeriodo(fechaISO, periodo) {
             const f = new Date(fechaISO);
             const hoy = new Date();
             
             if (periodo === 'semana') {
-                // Filtro última semana (últimos 7 días naturales)
                 const limiteSemana = new Date();
                 limiteSemana.setDate(hoy.getDate() - 7);
                 return f >= limiteSemana;
             } else if (periodo === 'mes') {
-                // Filtro mes actual
                 return f.getMonth() === hoy.getMonth() && f.getFullYear() === hoy.getFullYear();
             } else if (periodo === 'anio') {
-                // Filtro año actual
                 return f.getFullYear() === hoy.getFullYear();
             }
-            return true; // Si es 'todos'
+            return true;
         }
 
         // TABLERO DE GRÁFICOS (DASHBOARD)
@@ -439,10 +534,9 @@
         }
 
         function renderizarDashboard() {
-            const gastosFiltrados = listaGastos.filter(g => perteneceAPeriodo(g.fecha, filtroDashboardActual));
+            const gastosFiltrados = listaGastos.filter(g => pertenceAPeriodo(g.fecha, filtroDashboardActual));
 
-            // Ajustar factores de presupuesto según el rango para los límites visuales
-            let factorPeriodo = 1; // Por defecto mes
+            let factorPeriodo = 1;
             if (filtroDashboardActual === 'semana') factorPeriodo = 7 / 30;
             if (filtroDashboardActual === 'anio') factorPeriodo = 12;
 
@@ -460,7 +554,6 @@
                 categoriaTotales[g.categoria] = (categoriaTotales[g.categoria] || 0) + g.monto;
             });
 
-            // Actualizar barras
             document.getElementById('txt-bar-nec').innerText = `${formatoMoneda.format(totalNec)} / ${formatoMoneda.format(limiteNec)}`;
             document.getElementById('txt-bar-des').innerText = `${formatoMoneda.format(totalDes)} / ${formatoMoneda.format(limiteDes)}`;
 
@@ -475,7 +568,6 @@
             barDes.style.width = `${pctDes}%`;
             barDes.className = `h-full rounded-full transition-all duration-500 ${totalDes >= limiteDes ? 'bg-red-500' : (totalDes >= limiteDes * 0.8 ? 'bg-amber-500' : 'bg-orange-500')}`;
 
-            // Actualizar Gráfico circular (Chart.js)
             const canvas = document.getElementById('chartCategorias');
             const placeholder = document.getElementById('chart-placeholder');
 
@@ -535,7 +627,6 @@
                 return;
             }
 
-            // Mostrar todos los filtrados ordenados del más reciente al más antiguo
             filtrados.reverse().forEach(g => {
                 const item = document.createElement('div');
                 item.className = "flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl relative group";
@@ -571,6 +662,7 @@
                 listaGastos = listaGastos.filter(g => g.id !== id);
                 localStorage.setItem('lista_gastos', JSON.stringify(listaGastos));
                 filtrarHistorial();
+                actualizarValoresUI();
             }
         }
 
@@ -579,13 +671,31 @@
                 listaGastos = [];
                 localStorage.removeItem('lista_gastos');
                 filtrarHistorial();
+                actualizarValoresUI();
             }
         }
 
-        // ALERTAS EN MODAL
-        function lanzarAlerta(titulo, mensaje) {
+        // CONTROL DE MODALES DE ALERTA DINÁMICOS
+        function lanzarAlertaModalConfigurada(titulo, mensaje, tipo) {
+            const iconBox = document.getElementById('modal-alerta-icon-box');
+            const icon = document.getElementById('modal-alerta-icon');
+
             document.getElementById('modal-titulo').innerText = titulo;
             document.getElementById('modal-mensaje').innerText = mensaje;
+
+            // Configurar diseño de la alerta según gravedad
+            if (tipo === 'rojo') {
+                iconBox.className = "w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto";
+                icon.setAttribute('data-lucide', 'shield-alert');
+            } else if (tipo === 'amarillo') {
+                iconBox.className = "w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto";
+                icon.setAttribute('data-lucide', 'alert-triangle');
+            } else {
+                iconBox.className = "w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto";
+                icon.setAttribute('data-lucide', 'smile');
+            }
+
+            lucide.createIcons();
             document.getElementById('modal-alerta').classList.remove('hidden');
         }
 
