@@ -30,7 +30,7 @@
             <!-- ================= PANTALLA 1: INICIO & REGISTRO ================= -->
             <div id="pantalla-inicio" class="space-y-6">
                 
-                <!-- TABLERO DE BALANCE MENSUAL (RESTA EN DINERO) -->
+                <!-- TABLERO DE BALANCE MENSUAL -->
                 <section id="panel-balance" class="p-5 rounded-2xl border transition-all duration-300 text-center shadow-sm">
                     <span class="text-xs font-bold uppercase tracking-wider block mb-1 text-slate-500" id="lbl-balance">Disponible Restante (Mes)</span>
                     <span id="txt-balance" class="text-3xl font-extrabold block">$0</span>
@@ -111,7 +111,55 @@
             </div>
 
 
-            <!-- ================= PANTALLA 2: DASHBOARD & GRÁFICOS ================= -->
+            <!-- ================= PANTALLA 2: PRÉSTAMOS REALIZADOS (¡NUEVO!) ================= -->
+            <div id="pantalla-prestamos" class="space-y-6 hidden">
+                
+                <!-- TABLERO SALDO A FAVOR GENERAL -->
+                <section class="p-5 rounded-2xl border border-indigo-100 bg-indigo-50/50 text-center shadow-sm">
+                    <span class="text-xs font-bold uppercase tracking-wider block mb-1 text-indigo-500">Total que me deben</span>
+                    <span id="txt-total-deben" class="text-3xl font-extrabold block text-indigo-700">$0</span>
+                    <span class="text-[10px] text-indigo-400 font-semibold mt-1 block">Dinero activo prestado a otras personas</span>
+                </section>
+
+                <!-- REGISTRAR UN PRÉSTAMO -->
+                <section class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <h2 class="text-md font-bold text-slate-700 mb-3 flex items-center gap-1.5">
+                        <i data-lucide="hand-coins" class="w-4 h-4 text-indigo-600"></i> Registrar Nuevo Préstamo
+                    </h2>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">¿A quién le prestas?</label>
+                            <input id="input-prestamo-persona" type="text" placeholder="Ej. Juan Pérez" class="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 mb-1">Monto ($)</label>
+                                <input id="input-prestamo-monto" type="number" placeholder="Ej. 50000" class="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 mb-1">Nota / Detalle</label>
+                                <input id="input-prestamo-nota" type="text" placeholder="Ej. Para pasajes" class="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+                        <button onclick="agregarPrestamo()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg text-sm shadow-md transition-colors flex items-center justify-center gap-2 mt-2">
+                            <i data-lucide="check"></i> Guardar Préstamo
+                        </button>
+                    </div>
+                </section>
+
+                <!-- DEUDORES ACTIVOS -->
+                <section class="space-y-3">
+                    <h3 class="text-sm font-bold text-slate-600 flex items-center gap-1.5">
+                        <i data-lucide="users" class="w-4 h-4 text-indigo-600"></i> Lista de Deudores
+                    </h3>
+                    <div id="lista-deudores" class="space-y-3">
+                        <!-- Dinámico por JavaScript -->
+                    </div>
+                </section>
+            </div>
+
+
+            <!-- ================= PANTALLA 3: DASHBOARD & GRÁFICOS ================= -->
             <div id="pantalla-dashboard" class="space-y-6 hidden">
                 <!-- FILTRO TEMPORAL -->
                 <div class="flex justify-between bg-slate-100 p-1 rounded-xl">
@@ -154,7 +202,7 @@
             </div>
 
 
-            <!-- ================= PANTALLA 3: HISTORIAL DETALLADO ================= -->
+            <!-- ================= PANTALLA 4: HISTORIAL DETALLADO ================= -->
             <div id="pantalla-historial" class="space-y-4 hidden">
                 <!-- CABECERA HISTORIAL WITH FILTERS -->
                 <div class="flex flex-col gap-2">
@@ -183,11 +231,15 @@
 
         </main>
 
-        <!-- BARRA DE NAVEGACIÓN INFERIOR (TAB BAR) -->
+        <!-- BARRA DE NAVEGACIÓN INFERIOR (TAB BAR - ACTUALIZADA CON 4 BOTONES) -->
         <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 shadow-2xl flex justify-around py-3 z-40 rounded-t-2xl">
             <button onclick="cambiarPantalla('inicio')" id="nav-inicio" class="flex flex-col items-center gap-1 text-teal-600 font-bold transition-all">
                 <i data-lucide="home" class="w-5 h-5"></i>
                 <span class="text-[10px]">Registrar</span>
+            </button>
+            <button onclick="cambiarPantalla('prestamos')" id="nav-prestamos" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 transition-all">
+                <i data-lucide="hand-coins" class="w-5 h-5"></i>
+                <span class="text-[10px]">Préstamos</span>
             </button>
             <button onclick="cambiarPantalla('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 transition-all">
                 <i data-lucide="pie-chart" class="w-5 h-5"></i>
@@ -258,6 +310,7 @@
         };
 
         let listaGastos = JSON.parse(localStorage.getItem('lista_gastos')) || [];
+        let listaPrestamos = JSON.parse(localStorage.getItem('lista_prestamos')) || [];
         let filtroDashboardActual = 'mes'; 
         let graficoChart = null;
 
@@ -271,13 +324,15 @@
         lucide.createIcons();
         actualizarValoresUI();
 
-        // NAVEGACIÓN ENTRE PANTALLAS
+        // NAVEGACIÓN ENTRE PANTALLAS (Actualizada con 'prestamos')
         function cambiarPantalla(pantalla) {
             document.getElementById('pantalla-inicio').classList.add('hidden');
+            document.getElementById('pantalla-prestamos').classList.add('hidden');
             document.getElementById('pantalla-dashboard').classList.add('hidden');
             document.getElementById('pantalla-historial').classList.add('hidden');
 
             document.getElementById('nav-inicio').className = 'flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 transition-all';
+            document.getElementById('nav-prestamos').className = 'flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 transition-all';
             document.getElementById('nav-dashboard').className = 'flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 transition-all';
             document.getElementById('nav-historial').className = 'flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 transition-all';
 
@@ -286,6 +341,11 @@
                 document.getElementById('nav-inicio').className = 'flex flex-col items-center gap-1 text-teal-600 font-bold transition-all';
                 document.getElementById('subtitulo-app').innerText = "Registra un nuevo gasto diario";
                 actualizarValoresUI();
+            } else if (pantalla === 'prestamos') {
+                document.getElementById('pantalla-prestamos').classList.remove('hidden');
+                document.getElementById('nav-prestamos').className = 'flex flex-col items-center gap-1 text-indigo-600 font-bold transition-all';
+                document.getElementById('subtitulo-app').innerText = "Control de préstamos y cuentas por cobrar";
+                actualizarPrestamosUI();
             } else if (pantalla === 'dashboard') {
                 document.getElementById('pantalla-dashboard').classList.remove('hidden');
                 document.getElementById('nav-dashboard').className = 'flex flex-col items-center gap-1 text-teal-600 font-bold transition-all';
@@ -374,19 +434,16 @@
             txtBalance.innerText = formatoMoneda.format(disponibleRestante);
 
             if (disponibleRestante < 0) {
-                // Sobregirado (Rojo)
                 panelBalance.className = "p-5 rounded-2xl border border-red-200 bg-red-50 text-center shadow-sm";
                 txtBalance.className = "text-3xl font-extrabold block text-red-600";
                 badgeEstado.innerText = "SOBREGIRADO / NÚMEROS ROJOS ⚠️";
                 badgeEstado.className = "px-2.5 py-1 rounded-full bg-red-200 text-red-800 text-[10px]";
             } else if (disponibleRestante === 0) {
-                // Sin fondos
                 panelBalance.className = "p-5 rounded-2xl border border-slate-200 bg-slate-50 text-center shadow-sm";
                 txtBalance.className = "text-3xl font-extrabold block text-slate-800";
                 badgeEstado.innerText = "Límite Alcanzado (Saldo en cero)";
                 badgeEstado.className = "px-2.5 py-1 rounded-full bg-slate-200 text-slate-700 text-[10px]";
             } else {
-                // Positivo (Verde)
                 panelBalance.className = "p-5 rounded-2xl border border-emerald-100 bg-emerald-50/50 text-center shadow-sm";
                 txtBalance.className = "text-3xl font-extrabold block text-emerald-600";
                 badgeEstado.innerText = "Saldo Positivo ✔️";
@@ -425,7 +482,7 @@
 
             let titulo = "";
             let mensaje = "";
-            let tipoColor = "verde"; // verde, amarillo, rojo
+            let tipoColor = "verde"; 
 
             if (porcentajeGastoRealizado > 100) {
                 tipoColor = "rojo";
@@ -460,7 +517,6 @@
                 return;
             }
 
-            // Calcular acumulados de Necesidades o Deseos en el mes actual para evaluar las alertas instantáneas
             let acumuladoGrupoMes = 0;
             const ahora = new Date();
             listaGastos.forEach(g => {
@@ -502,6 +558,144 @@
                 alert("Gasto guardado correctamente.");
             }
         }
+
+
+        // ================= LÓGICA DE PRÉSTAMOS (¡NUEVA!) =================
+
+        function agregarPrestamo() {
+            const inputPersona = document.getElementById('input-prestamo-persona');
+            const inputMonto = document.getElementById('input-prestamo-monto');
+            const inputNota = document.getElementById('input-prestamo-nota');
+
+            const persona = inputPersona.value.trim();
+            const monto = parseFloat(inputMonto.value);
+            const nota = inputNota.value.trim();
+
+            if (!persona) {
+                alert("Por favor introduce el nombre de la persona.");
+                return;
+            }
+            if (isNaN(monto) || monto <= 0) {
+                alert("Introduce un monto de préstamo válido.");
+                return;
+            }
+
+            const nuevoPrestamo = {
+                id: Date.now(),
+                persona: persona,
+                monto: monto,
+                nota: nota,
+                fecha: new Date().toISOString(),
+                pagado: false
+            };
+
+            listaPrestamos.push(nuevoPrestamo);
+            localStorage.setItem('lista_prestamos', JSON.stringify(listaPrestamos));
+
+            // Limpiar inputs
+            inputPersona.value = '';
+            inputMonto.value = '';
+            inputNota.value = '';
+
+            actualizarPrestamosUI();
+            alert(`Préstamo registrado a nombre de ${persona}.`);
+        }
+
+        function liquidarPrestamo(id) {
+            const index = listaPrestamos.findIndex(p => p.id === id);
+            if (index !== -1) {
+                listaPrestamos[index].pagado = true;
+                localStorage.setItem('lista_prestamos', JSON.stringify(listaPrestamos));
+                actualizarPrestamosUI();
+            }
+        }
+
+        function actualizarPrestamosUI() {
+            const listaContenedor = document.getElementById('lista-deudores');
+            const txtTotalDeben = document.getElementById('txt-total-deben');
+            listaContenedor.innerHTML = '';
+
+            // Filtrar solo préstamos no pagados
+            const activos = listaPrestamos.filter(p => !p.pagado);
+
+            // Calcular Total Global Owed
+            const totalGeneral = activos.reduce((acc, p) => acc + p.monto, 0);
+            txtTotalDeben.innerText = formatoMoneda.format(totalGeneral);
+
+            if (activos.length === 0) {
+                listaContenedor.innerHTML = `
+                    <div class="p-6 text-center text-slate-400 text-xs bg-slate-50 border border-slate-100 rounded-2xl">
+                        <i data-lucide="party-popper" class="w-8 h-8 text-indigo-300 mx-auto mb-2"></i>
+                        ¡Nadie te debe dinero actualmente! Estás al día.
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            // Agrupar préstamos por nombre de persona (Sin distinguir mayúsculas/minúsculas de manera estricta)
+            const deudasAgrupadas = {};
+            activos.forEach(p => {
+                const key = p.persona;
+                if (!deudasAgrupadas[key]) {
+                    deudasAgrupadas[key] = {
+                        totalDebido: 0,
+                        prestamos: []
+                    };
+                }
+                deudasAgrupadas[key].totalDebido += p.monto;
+                deudasAgrupadas[key].prestamos.push(p);
+            });
+
+            // Generar tarjetas por deudor
+            Object.keys(deudasAgrupadas).forEach(persona => {
+                const datos = deudasAgrupadas[persona];
+                
+                const card = document.createElement('div');
+                card.className = "bg-white border border-slate-100 shadow-sm rounded-xl overflow-hidden p-4 space-y-3";
+
+                // Sublista con préstamos específicos de esa persona
+                let itemHtmlPrestamos = '';
+                datos.prestamos.forEach(p => {
+                    itemHtmlPrestamos += `
+                        <div class="flex items-center justify-between text-xs py-1.5 border-b border-dashed last:border-0">
+                            <div>
+                                <p class="text-slate-500 font-medium">
+                                    ${p.nota ? p.nota : 'Préstamo sin nota'}
+                                </p>
+                                <span class="text-[9px] text-slate-400 block">${new Date(p.fecha).toLocaleDateString()}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-slate-700">${formatoMoneda.format(p.monto)}</span>
+                                <button onclick="liquidarPrestamo(${p.id})" class="text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 p-1.5 rounded-md transition-colors" title="Marcar como cobrado/pagado">
+                                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                            <span class="font-bold text-slate-800 text-sm">${persona}</span>
+                        </div>
+                        <span class="text-xs font-extrabold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full">
+                            Debe: ${formatoMoneda.format(datos.totalDebido)}
+                        </span>
+                    </div>
+                    <div class="space-y-1">
+                        ${itemHtmlPrestamos}
+                    </div>
+                `;
+
+                listaContenedor.appendChild(card);
+            });
+
+            lucide.createIcons();
+        }
+
 
         // FILTROS TEMPORALES DE FECHA
         function pertenceAPeriodo(fechaISO, periodo) {
@@ -683,7 +877,6 @@
             document.getElementById('modal-titulo').innerText = titulo;
             document.getElementById('modal-mensaje').innerText = mensaje;
 
-            // Configurar diseño de la alerta según gravedad
             if (tipo === 'rojo') {
                 iconBox.className = "w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto";
                 icon.setAttribute('data-lucide', 'shield-alert');
