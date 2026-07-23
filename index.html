@@ -53,25 +53,29 @@
                         </button>
                     </div>
                     
-                    <div class="grid grid-cols-3 gap-2 text-center">
-                        <div class="p-2 bg-white rounded-lg border">
-                            <span class="text-[10px] text-slate-400 font-bold block">Ingreso</span>
-                            <span id="txt-ingreso" class="text-xs font-bold text-slate-800">$0</span>
+                    <div class="grid grid-cols-2 gap-2 text-center">
+                        <div class="p-2 bg-white rounded-lg border col-span-2">
+                            <span class="text-[10px] text-slate-400 font-bold block">Ingreso Total</span>
+                            <span id="txt-ingreso" class="text-sm font-extrabold text-slate-800">$0</span>
                         </div>
                         <div class="p-2 bg-white rounded-lg border">
                             <span class="text-[10px] text-blue-500 font-bold block" id="lbl-pct-nec">Necesidad (50%)</span>
                             <span id="txt-limite-nec" class="text-xs font-bold text-blue-600">$0</span>
                         </div>
                         <div class="p-2 bg-white rounded-lg border">
-                            <span class="text-[10px] text-orange-500 font-bold block" id="lbl-pct-des">Deseos (30%)</span>
+                            <span class="text-[10px] text-orange-500 font-bold block" id="lbl-pct-des">Deseos (20%)</span>
                             <span id="txt-limite-des" class="text-xs font-bold text-orange-600">$0</span>
+                        </div>
+                        <div class="p-2 bg-white rounded-lg border col-span-2">
+                            <span class="text-[10px] text-purple-600 font-bold block" id="lbl-pct-pat">Patrimonio (15%)</span>
+                            <span id="txt-limite-pat" class="text-xs font-bold text-purple-700">$0</span>
                         </div>
                     </div>
 
                     <div class="p-3 bg-teal-50 rounded-xl flex justify-between items-center">
                         <div class="flex items-center gap-2">
                             <i data-lucide="shield-check" class="text-teal-600 w-5 h-5"></i>
-                            <span class="text-xs font-bold text-teal-800" id="lbl-pct-aho">Meta de Ahorro (20%)</span>
+                            <span class="text-xs font-bold text-teal-800" id="lbl-pct-aho">Meta de Ahorro (15%)</span>
                         </div>
                         <span id="txt-meta-ahorro" class="text-sm font-extrabold text-teal-700">$0</span>
                     </div>
@@ -80,7 +84,7 @@
                 <!-- FORMULARIO NUEVO GASTO -->
                 <section class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
                     <h2 class="text-md font-bold text-slate-700 mb-3 flex items-center gap-1">
-                        <i data-lucide="plus-circle" class="w-4 h-4 text-teal-600"></i> Registrar Gasto
+                        <i data-lucide="plus-circle" class="w-4 h-4 text-teal-600"></i> Registrar Gasto / Inversión
                     </h2>
                     <div class="space-y-3">
                         <div>
@@ -93,12 +97,18 @@
                                     <option value="Servicios" data-grupo="Necesidad">💡 Servicios Públicos</option>
                                     <option value="Aseo Personal" data-grupo="Necesidad">🧼 Aseo e Higiene Personal</option>
                                 </optgroup>
-                                <optgroup label="Deseos y Bienestar (Gastos Flexibles)">
+                                <optgroup label="Deseos, Ocio y Bienestar">
                                     <option value="Mascotas" data-grupo="Deseo">🐾 Mascotas (Comida, Vet, Accesorios)</option>
                                     <option value="Salud y Gym" data-grupo="Deseo">🏋️‍♂️ Gimnasio / Salud y Deporte</option>
                                     <option value="Diversión" data-grupo="Deseo">🎉 Diversión / Ocio</option>
                                     <option value="Comida" data-grupo="Deseo">🍔 Restaurantes / Salidas</option>
-                                    <option value="Compras" data-grupo="Deseo">🛍️ Ropa / Compras</option>
+                                    <option value="Compras" data-grupo="Deseo">🛍️ Ropa / Compras Pequeñas</option>
+                                </optgroup>
+                                <optgroup label="Patrimonio / Bienes Duraderos">
+                                    <option value="Tecnología" data-grupo="Patrimonio">📺 Tecnología y Electrónica</option>
+                                    <option value="Muebles y Hogar" data-grupo="Patrimonio">🛋️ Muebles y Hogar</option>
+                                    <option value="Vehículos" data-grupo="Patrimonio">🚗 Vehículos y Mantenimiento</option>
+                                    <option value="Mejoras Hogar" data-grupo="Patrimonio">🏡 Mejoras del Hogar</option>
                                 </optgroup>
                             </select>
                         </div>
@@ -108,10 +118,10 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-500 mb-1">Descripción / Nota</label>
-                            <input id="input-nota" type="text" placeholder="Ej. Almuerzo, Concentrado, Mensualidad" class="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                            <input id="input-nota" type="text" placeholder="Ej. TV para sala, Sofá, Repuesto carro" class="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
                         </div>
                         <button onclick="agregarGasto()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-lg text-sm shadow-md transition-colors flex items-center justify-center gap-2 mt-2">
-                            <i data-lucide="check"></i> Guardar Gasto
+                            <i data-lucide="check"></i> Guardar Movimiento
                         </button>
                     </div>
                 </section>
@@ -120,15 +130,12 @@
 
             <!-- ================= PANTALLA 2: PRÉSTAMOS REALIZADOS ================= -->
             <div id="pantalla-prestamos" class="space-y-6 hidden">
-                
-                <!-- TABLERO SALDO A FAVOR GENERAL -->
                 <section class="p-5 rounded-2xl border border-indigo-100 bg-indigo-50/50 text-center shadow-sm">
                     <span class="text-xs font-bold uppercase tracking-wider block mb-1 text-indigo-500">Total que me deben</span>
                     <span id="txt-total-deben" class="text-3xl font-extrabold block text-indigo-700">$0</span>
                     <span class="text-[10px] text-indigo-400 font-semibold mt-1 block">Dinero activo prestado a otras personas</span>
                 </section>
 
-                <!-- REGISTRAR UN PRÉSTAMO -->
                 <section class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
                     <h2 class="text-md font-bold text-slate-700 mb-3 flex items-center gap-1.5">
                         <i data-lucide="hand-coins" class="w-4 h-4 text-indigo-600"></i> Registrar Nuevo Préstamo
@@ -154,39 +161,35 @@
                     </div>
                 </section>
 
-                <!-- DEUDORES ACTIVOS -->
                 <section class="space-y-3">
                     <h3 class="text-sm font-bold text-slate-600 flex items-center gap-1.5">
                         <i data-lucide="users" class="w-4 h-4 text-indigo-600"></i> Lista de Deudores
                     </h3>
-                    <div id="lista-deudores" class="space-y-3">
-                        <!-- Dinámico por JavaScript -->
-                    </div>
+                    <div id="lista-deudores" class="space-y-3"></div>
                 </section>
             </div>
 
 
             <!-- ================= PANTALLA 3: DASHBOARD & GRÁFICOS ================= -->
             <div id="pantalla-dashboard" class="space-y-6 hidden">
-                <!-- FILTRO TEMPORAL -->
                 <div class="flex justify-between bg-slate-100 p-1 rounded-xl">
                     <button onclick="cambiarFiltroDashboard('semana')" id="btn-db-semana" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white shadow-sm text-slate-800 transition-all">Semana</button>
                     <button onclick="cambiarFiltroDashboard('mes')" id="btn-db-mes" class="flex-1 py-2 text-xs font-bold rounded-lg text-slate-500 hover:text-slate-800 transition-all">Mes</button>
                     <button onclick="cambiarFiltroDashboard('anio')" id="btn-db-anio" class="flex-1 py-2 text-xs font-bold rounded-lg text-slate-500 hover:text-slate-800 transition-all">Año</button>
                 </div>
 
-                <!-- CONTENEDOR DEL GRÁFICO -->
                 <section class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center">
                     <h3 class="text-sm font-bold text-slate-600 self-start mb-4">Análisis de Distribución</h3>
                     <div class="w-64 h-64">
                         <canvas id="chartCategorias"></canvas>
                     </div>
-                    <div id="chart-placeholder" class="text-xs text-slate-400 py-10 hidden">No hay gastos en este rango para mostrar en el gráfico.</div>
+                    <div id="chart-placeholder" class="text-xs text-slate-400 py-10 hidden">No hay movimientos en este rango para mostrar en el gráfico.</div>
                 </section>
 
-                <!-- BARRAS DE CONTROL (NECESIDADES VS DESEOS) -->
+                <!-- BARRAS DE CONTROL POR CADA GRUPO DE PRESUPUESTO -->
                 <section class="space-y-3">
-                    <h3 class="text-sm font-bold text-slate-600">Límites del Período Seleccionado</h3>
+                    <h3 class="text-sm font-bold text-slate-600">Límites por Grupo (Período Seleccionado)</h3>
+                    
                     <div class="bg-slate-50 p-4 rounded-xl border">
                         <div class="flex justify-between text-xs mb-1 font-semibold text-blue-700">
                             <span>Necesidades</span>
@@ -196,13 +199,24 @@
                             <div id="bar-db-necesidades" class="bg-blue-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
                         </div>
                     </div>
+
                     <div class="bg-slate-50 p-4 rounded-xl border">
                         <div class="flex justify-between text-xs mb-1 font-semibold text-orange-600">
-                            <span>Deseos / Ocio / Bienestar</span>
+                            <span>Deseos / Ocio</span>
                             <span id="txt-bar-des">$0 / $0</span>
                         </div>
                         <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
                             <div id="bar-db-deseos" class="bg-orange-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 p-4 rounded-xl border">
+                        <div class="flex justify-between text-xs mb-1 font-semibold text-purple-700">
+                            <span>Patrimonio / Bienes Duraderos</span>
+                            <span id="txt-bar-pat">$0 / $0</span>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                            <div id="bar-db-patrimonio" class="bg-purple-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
                         </div>
                     </div>
                 </section>
@@ -211,7 +225,6 @@
 
             <!-- ================= PANTALLA 4: HISTORIAL DETALLADO ================= -->
             <div id="pantalla-historial" class="space-y-4 hidden">
-                <!-- CABECERA HISTORIAL WITH FILTERS -->
                 <div class="flex flex-col gap-2">
                     <div class="flex justify-between items-center">
                         <h2 class="text-md font-bold text-slate-700 flex items-center gap-1">
@@ -221,7 +234,6 @@
                             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Limpiar Todo
                         </button>
                     </div>
-                    <!-- Selector de Rango -->
                     <select id="filtro-rango-historial" onchange="filtrarHistorial()" class="w-full bg-slate-100 border-none rounded-lg p-2.5 text-xs font-bold text-slate-700 focus:outline-none">
                         <option value="todos" selected>📅 Ver Todo el Historial</option>
                         <option value="semana">📅 Esta Semana</option>
@@ -230,10 +242,7 @@
                     </select>
                 </div>
 
-                <!-- CONTENEDOR DE LA LISTA DETALLADA -->
-                <div id="lista-historial-completo" class="space-y-2 max-h-[60vh] overflow-y-auto pr-1">
-                    <!-- Dinámico -->
-                </div>
+                <div id="lista-historial-completo" class="space-y-2 max-h-[60vh] overflow-y-auto pr-1"></div>
             </div>
 
         </main>
@@ -263,7 +272,7 @@
     <div id="modal-config" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50 transition-all">
         <div class="bg-white rounded-2xl p-6 max-w-xs w-full shadow-2xl space-y-4">
             <div class="flex justify-between items-center">
-                <h3 class="text-md font-bold text-slate-800">Ajustes de Ahorro</h3>
+                <h3 class="text-md font-bold text-slate-800">Ajustes de Presupuesto</h3>
                 <button onclick="cerrarConfiguracion()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             
@@ -278,11 +287,15 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 mb-1">Deseos (%)</label>
-                    <input id="cfg-des" type="number" oninput="calcularAhorroAutomatico()" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-sm focus:outline-none" placeholder="30">
+                    <input id="cfg-des" type="number" oninput="calcularAhorroAutomatico()" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-sm focus:outline-none" placeholder="20">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Patrimonio / Bienes (%)</label>
+                    <input id="cfg-pat" type="number" oninput="calcularAhorroAutomatico()" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-sm focus:outline-none" placeholder="15">
                 </div>
                 <div class="p-3 bg-teal-50 rounded-lg border border-teal-100 flex justify-between items-center text-xs font-bold text-teal-800">
                     <span>Ahorro Restante:</span>
-                    <span id="cfg-total-ahorro">20%</span>
+                    <span id="cfg-total-ahorro">15%</span>
                 </div>
             </div>
 
@@ -310,7 +323,7 @@
     <div id="modal-editar" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-6 max-w-xs w-full shadow-2xl space-y-4">
             <div class="flex justify-between items-center">
-                <h3 class="text-md font-bold text-slate-800">Editar Gasto</h3>
+                <h3 class="text-md font-bold text-slate-800">Editar Movimiento</h3>
                 <button onclick="cerrarEditarGasto()" class="text-slate-400 hover:text-slate-600">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
@@ -327,12 +340,18 @@
                             <option value="Servicios" data-grupo="Necesidad">💡 Servicios Públicos</option>
                             <option value="Aseo Personal" data-grupo="Necesidad">🧼 Aseo e Higiene Personal</option>
                         </optgroup>
-                        <optgroup label="Deseos y Bienestar (Gastos Flexibles)">
+                        <optgroup label="Deseos, Ocio y Bienestar">
                             <option value="Mascotas" data-grupo="Deseo">🐾 Mascotas (Comida, Vet, Accesorios)</option>
                             <option value="Salud y Gym" data-grupo="Deseo">🏋️‍♂️ Gimnasio / Salud y Deporte</option>
                             <option value="Diversión" data-grupo="Deseo">🎉 Diversión / Ocio</option>
                             <option value="Comida" data-grupo="Deseo">🍔 Restaurantes / Salidas</option>
-                            <option value="Compras" data-grupo="Deseo">🛍️ Ropa / Compras</option>
+                            <option value="Compras" data-grupo="Deseo">🛍️ Ropa / Compras Pequeñas</option>
+                        </optgroup>
+                        <optgroup label="Patrimonio / Bienes Duraderos">
+                            <option value="Tecnología" data-grupo="Patrimonio">📺 Tecnología y Electrónica</option>
+                            <option value="Muebles y Hogar" data-grupo="Patrimonio">🛋️ Muebles y Hogar</option>
+                            <option value="Vehículos" data-grupo="Patrimonio">🚗 Vehículos y Mantenimiento</option>
+                            <option value="Mejoras Hogar" data-grupo="Patrimonio">🏡 Mejoras del Hogar</option>
                         </optgroup>
                     </select>
                 </div>
@@ -346,7 +365,7 @@
                 </div>
             </div>
             <button onclick="guardarGastoEditado()" class="w-full bg-teal-600 hover:bg-teal-700 text-white py-2.5 rounded-lg text-sm font-semibold transition-colors">
-                Actualizar Gasto
+                Actualizar Movimiento
             </button>
         </div>
     </div>
@@ -357,8 +376,9 @@
         let config = JSON.parse(localStorage.getItem('config_presupuesto')) || {
             ingreso: 3000000,
             pctNecesidades: 50,
-            pctDeseos: 30,
-            pctAhorro: 20
+            pctDeseos: 20,
+            pctPatrimonio: 15,
+            pctAhorro: 15
         };
 
         let listaGastos = JSON.parse(localStorage.getItem('lista_gastos')) || [];
@@ -372,7 +392,7 @@
             minimumFractionDigits: 0
         });
 
-        // Iconos de mapeo dinámico para el historial
+        // Iconos de mapeo dinámico
         const iconosCategoria = {
             'Arriendo': 'home',
             'Mercado': 'shopping-cart',
@@ -383,7 +403,11 @@
             'Salud y Gym': 'dumbbell',
             'Diversión': 'party-popper',
             'Comida': 'utensils',
-            'Compras': 'shopping-bag'
+            'Compras': 'shopping-bag',
+            'Tecnología': 'tv',
+            'Muebles y Hogar': 'sofa',
+            'Vehículos': 'car',
+            'Mejoras Hogar': 'hammer'
         };
 
         // Inicializar Iconos
@@ -405,7 +429,7 @@
             if (pantalla === 'inicio') {
                 document.getElementById('pantalla-inicio').classList.remove('hidden');
                 document.getElementById('nav-inicio').className = 'flex flex-col items-center gap-1 text-teal-600 font-bold transition-all';
-                document.getElementById('subtitulo-app').innerText = "Registra un nuevo gasto diario";
+                document.getElementById('subtitulo-app').innerText = "Registra un nuevo gasto diario o inversión";
                 actualizarValoresUI();
             } else if (pantalla === 'prestamos') {
                 document.getElementById('pantalla-prestamos').classList.remove('hidden');
@@ -430,6 +454,7 @@
             document.getElementById('cfg-ingreso').value = config.ingreso;
             document.getElementById('cfg-nec').value = config.pctNecesidades;
             document.getElementById('cfg-des').value = config.pctDeseos;
+            document.getElementById('cfg-pat').value = config.pctPatrimonio || 15;
             calcularAhorroAutomatico();
             document.getElementById('modal-config').classList.remove('hidden');
         }
@@ -441,7 +466,8 @@
         function calcularAhorroAutomatico() {
             const nec = parseInt(document.getElementById('cfg-nec').value) || 0;
             const des = parseInt(document.getElementById('cfg-des').value) || 0;
-            const restante = 100 - (nec + des);
+            const pat = parseInt(document.getElementById('cfg-pat').value) || 0;
+            const restante = 100 - (nec + des + pat);
             
             const txtAhorro = document.getElementById('cfg-total-ahorro');
             txtAhorro.innerText = `${restante}%`;
@@ -457,18 +483,19 @@
             const ingreso = parseFloat(document.getElementById('cfg-ingreso').value) || 0;
             const nec = parseInt(document.getElementById('cfg-nec').value) || 0;
             const des = parseInt(document.getElementById('cfg-des').value) || 0;
-            const ahorro = 100 - (nec + des);
+            const pat = parseInt(document.getElementById('cfg-pat').value) || 0;
+            const ahorro = 100 - (nec + des + pat);
 
-            if (ingreso <= 0 || nec < 0 || des < 0) {
+            if (ingreso <= 0 || nec < 0 || des < 0 || pat < 0) {
                 alert("Por favor introduce valores positivos y correctos.");
                 return;
             }
             if (ahorro < 0) {
-                alert("Los porcentajes de Necesidades y Deseos no pueden superar el 100%.");
+                alert("La suma de porcentajes no puede superar el 100%.");
                 return;
             }
 
-            config = { ingreso, pctNecesidades: nec, pctDeseos: des, pctAhorro: ahorro };
+            config = { ingreso, pctNecesidades: nec, pctDeseos: des, pctPatrimonio: pat, pctAhorro: ahorro };
             localStorage.setItem('config_presupuesto', JSON.stringify(config));
             cerrarConfiguracion();
             actualizarValoresUI();
@@ -477,9 +504,9 @@
         function actualizarValoresUI() {
             const limiteNec = config.ingreso * (config.pctNecesidades / 100);
             const limiteDes = config.ingreso * (config.pctDeseos / 100);
+            const limitePat = config.ingreso * ((config.pctPatrimonio || 15) / 100);
             const metaAhorro = config.ingreso * (config.pctAhorro / 100);
 
-            // Calcular gastos totales de este mes para el balance disponible
             let totalGastadoMes = 0;
             const ahora = new Date();
             listaGastos.forEach(g => {
@@ -489,10 +516,8 @@
                 }
             });
 
-            // Disponible real del mes = Ingreso - Meta Ahorro - Gastos Realizados
             const disponibleRestante = config.ingreso - metaAhorro - totalGastadoMes;
 
-            // UI del Balance
             const panelBalance = document.getElementById('panel-balance');
             const txtBalance = document.getElementById('txt-balance');
             const badgeEstado = document.getElementById('badge-estado');
@@ -519,14 +544,16 @@
             document.getElementById('txt-ingreso').innerText = formatoMoneda.format(config.ingreso);
             document.getElementById('txt-limite-nec').innerText = formatoMoneda.format(limiteNec);
             document.getElementById('txt-limite-des').innerText = formatoMoneda.format(limiteDes);
+            document.getElementById('txt-limite-pat').innerText = formatoMoneda.format(limitePat);
             document.getElementById('txt-meta-ahorro').innerText = formatoMoneda.format(metaAhorro);
 
             document.getElementById('lbl-pct-nec').innerText = `Necesidad (${config.pctNecesidades}%)`;
             document.getElementById('lbl-pct-des').innerText = `Deseos (${config.pctDeseos}%)`;
+            document.getElementById('lbl-pct-pat').innerText = `Patrimonio (${config.pctPatrimonio || 15}%)`;
             document.getElementById('lbl-pct-aho').innerText = `Ahorro (${config.pctAhorro}%)`;
         }
 
-        // EVALUACIÓN DE SALUD FINANCIERA (DIAGNÓSTICO)
+        // EVALUACIÓN DE SALUD FINANCIERA
         function diagnosticarSaludFinanciera() {
             const ahora = new Date();
             const diaDelMes = ahora.getDate();
@@ -553,15 +580,15 @@
             if (porcentajeGastoRealizado > 100) {
                 tipoColor = "rojo";
                 titulo = "¡Alerta: Sobregiro Financiero!";
-                mensaje = `Te has pasado de tu presupuesto disponible por ${formatoMoneda.format(totalGastadoMes - presupuestoGastable)}. Estás tocando tu fondo de ahorro o acumulando deudas. ¡Detén los gastos no esenciales de inmediato!`;
+                mensaje = `Te has pasado de tu presupuesto disponible por ${formatoMoneda.format(totalGastadoMes - presupuestoGastable)}. ¡Detén los gastos no esenciales de inmediato!`;
             } else if (porcentajeGastoRealizado > porcentajeMesTranscurrido + 15) {
                 tipoColor = "amarillo";
-                titulo = "Vas muy rápido en el mes";
-                mensaje = `Hoy es el día ${diaDelMes} del mes (${Math.round(porcentajeMesTranscurrido)}% transcurrido), pero ya has gastado el ${Math.round(porcentajeGastoRealizado)}% de tu presupuesto. Intenta disminuir el ritmo de tus gastos de Deseos para no quedarte sin saldo antes de que acabe el mes.`;
+                titulo = "Vas acelerado en el mes";
+                mensaje = `Hoy es el día ${diaDelMes} (${Math.round(porcentajeMesTranscurrido)}% del mes), pero ya has consumido el ${Math.round(porcentajeGastoRealizado)}% de tu presupuesto. Ajusta los gastos de Deseos/Patrimonio los próximos días.`;
             } else {
                 tipoColor = "verde";
                 titulo = "¡Excelente control del mes!";
-                mensaje = `Vas muy bien. El mes va en el ${Math.round(porcentajeMesTranscurrido)}% y tu consumo de presupuesto es de apenas el ${Math.round(porcentajeGastoRealizado)}%. Sigue así y es muy probable que acumules un extra para tu ahorro este mes.`;
+                mensaje = `El mes va en el ${Math.round(porcentajeMesTranscurrido)}% y tu consumo es de apenas el ${Math.round(porcentajeGastoRealizado)}%. Sigue así para asegurar tu meta de ahorro.`;
             }
 
             lanzarAlertaModalConfigurada(titulo, mensaje, tipoColor);
@@ -607,9 +634,10 @@
             inputMonto.value = '';
             inputNota.value = '';
 
-            const limiteDelMes = grupo === 'Necesidad' 
-                ? config.ingreso * (config.pctNecesidades / 100) 
-                : config.ingreso * (config.pctDeseos / 100);
+            let limiteDelMes = 0;
+            if (grupo === 'Necesidad') limiteDelMes = config.ingreso * (config.pctNecesidades / 100);
+            else if (grupo === 'Deseo') limiteDelMes = config.ingreso * (config.pctDeseos / 100);
+            else if (grupo === 'Patrimonio') limiteDelMes = config.ingreso * ((config.pctPatrimonio || 15) / 100);
 
             const pctAnterior = (acumuladoGrupoMes / limiteDelMes) * 100;
             const pctActual = ((acumuladoGrupoMes + monto) / limiteDelMes) * 100;
@@ -617,17 +645,15 @@
             actualizarValoresUI();
 
             if (pctAnterior < 80 && pctActual >= 80 && pctActual < 100) {
-                lanzarAlertaModalConfigurada("¡Atención (80%)!", `Tu gasto mensual en ${grupo}s ya superó el 80% de tu límite asignado.`, "amarillo");
+                lanzarAlertaModalConfigurada("¡Atención (80%)!", `El consumo mensual en ${grupo} ya superó el 80% de tu límite.`, "amarillo");
             } else if (pctAnterior < 100 && pctActual >= 100) {
-                lanzarAlertaModalConfigurada("¡Límite Superado!", `Has gastado más del 100% de tu presupuesto mensual para ${grupo}s.`, "rojo");
+                lanzarAlertaModalConfigurada("¡Límite Superado!", `Has gastado más del 100% de tu presupuesto asignado para ${grupo}.`, "rojo");
             } else {
-                alert("Gasto guardado correctamente.");
+                alert("Movimiento guardado correctamente.");
             }
         }
 
-
-        // ================= LÓGICA DE PRÉSTAMOS =================
-
+        // PRÉSTAMOS
         function agregarPrestamo() {
             const inputPersona = document.getElementById('input-prestamo-persona');
             const inputMonto = document.getElementById('input-prestamo-monto');
@@ -658,7 +684,6 @@
             listaPrestamos.push(nuevoPrestamo);
             localStorage.setItem('lista_prestamos', JSON.stringify(listaPrestamos));
 
-            // Limpiar inputs
             inputPersona.value = '';
             inputMonto.value = '';
             inputNota.value = '';
@@ -681,10 +706,7 @@
             const txtTotalDeben = document.getElementById('txt-total-deben');
             listaContenedor.innerHTML = '';
 
-            // Filtrar solo préstamos no pagados
             const activos = listaPrestamos.filter(p => !p.pagado);
-
-            // Calcular Total Global Owed
             const totalGeneral = activos.reduce((acc, p) => acc + p.monto, 0);
             txtTotalDeben.innerText = formatoMoneda.format(totalGeneral);
 
@@ -699,41 +721,32 @@
                 return;
             }
 
-            // Agrupar préstamos por nombre de persona
             const deudasAgrupadas = {};
             activos.forEach(p => {
                 const key = p.persona;
                 if (!deudasAgrupadas[key]) {
-                    deudasAgrupadas[key] = {
-                        totalDebido: 0,
-                        prestamos: []
-                    };
+                    deudasAgrupadas[key] = { totalDebido: 0, prestamos: [] };
                 }
                 deudasAgrupadas[key].totalDebido += p.monto;
                 deudasAgrupadas[key].prestamos.push(p);
             });
 
-            // Generar tarjetas por deudor
             Object.keys(deudasAgrupadas).forEach(persona => {
                 const datos = deudasAgrupadas[persona];
-                
                 const card = document.createElement('div');
                 card.className = "bg-white border border-slate-100 shadow-sm rounded-xl overflow-hidden p-4 space-y-3";
 
-                // Sublista con préstamos específicos de esa persona
                 let itemHtmlPrestamos = '';
                 datos.prestamos.forEach(p => {
                     itemHtmlPrestamos += `
                         <div class="flex items-center justify-between text-xs py-1.5 border-b border-dashed last:border-0">
                             <div>
-                                <p class="text-slate-500 font-medium">
-                                    ${p.nota ? p.nota : 'Préstamo sin nota'}
-                                </p>
+                                <p class="text-slate-500 font-medium">${p.nota ? p.nota : 'Préstamo sin nota'}</p>
                                 <span class="text-[9px] text-slate-400 block">${new Date(p.fecha).toLocaleDateString()}</span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="font-bold text-slate-700">${formatoMoneda.format(p.monto)}</span>
-                                <button onclick="liquidarPrestamo(${p.id})" class="text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 p-1.5 rounded-md transition-colors" title="Marcar como cobrado/pagado">
+                                <button onclick="liquidarPrestamo(${p.id})" class="text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 p-1.5 rounded-md transition-colors" title="Marcar como cobrado">
                                     <i data-lucide="check" class="w-3.5 h-3.5"></i>
                                 </button>
                             </div>
@@ -751,9 +764,7 @@
                             Debe: ${formatoMoneda.format(datos.totalDebido)}
                         </span>
                     </div>
-                    <div class="space-y-1">
-                        ${itemHtmlPrestamos}
-                    </div>
+                    <div class="space-y-1">${itemHtmlPrestamos}</div>
                 `;
 
                 listaContenedor.appendChild(card);
@@ -762,9 +773,7 @@
             lucide.createIcons();
         }
 
-
-        // ================= EDICIÓN DE GASTOS =================
-
+        // EDICIÓN DE GASTOS
         function abrirEditarGasto(id) {
             const gasto = listaGastos.find(g => g.id === id);
             if (!gasto) return;
@@ -807,10 +816,9 @@
                 cerrarEditarGasto();
                 filtrarHistorial();
                 actualizarValoresUI();
-                alert("Gasto modificado correctamente.");
+                alert("Movimiento modificado correctamente.");
             }
         }
-
 
         // FILTROS TEMPORALES DE FECHA
         function pertenceAPeriodo(fechaISO, periodo) {
@@ -829,7 +837,7 @@
             return true;
         }
 
-        // TABLERO DE GRÁFICOS (DASHBOARD)
+        // DASHBOARD
         function cambiarFiltroDashboard(periodo) {
             filtroDashboardActual = periodo;
             
@@ -851,23 +859,28 @@
 
             const limiteNec = (config.ingreso * (config.pctNecesidades / 100)) * factorPeriodo;
             const limiteDes = (config.ingreso * (config.pctDeseos / 100)) * factorPeriodo;
+            const limitePat = (config.ingreso * ((config.pctPatrimonio || 15) / 100)) * factorPeriodo;
 
             let totalNec = 0;
             let totalDes = 0;
+            let totalPat = 0;
             let categoriaTotales = {};
 
             gastosFiltrados.forEach(g => {
                 if (g.grupo === 'Necesidad') totalNec += g.monto;
                 if (g.grupo === 'Deseo') totalDes += g.monto;
+                if (g.grupo === 'Patrimonio') totalPat += g.monto;
 
                 categoriaTotales[g.categoria] = (categoriaTotales[g.categoria] || 0) + g.monto;
             });
 
             document.getElementById('txt-bar-nec').innerText = `${formatoMoneda.format(totalNec)} / ${formatoMoneda.format(limiteNec)}`;
             document.getElementById('txt-bar-des').innerText = `${formatoMoneda.format(totalDes)} / ${formatoMoneda.format(limiteDes)}`;
+            document.getElementById('txt-bar-pat').innerText = `${formatoMoneda.format(totalPat)} / ${formatoMoneda.format(limitePat)}`;
 
             const pctNec = Math.min((totalNec / limiteNec) * 100, 100) || 0;
             const pctDes = Math.min((totalDes / limiteDes) * 100, 100) || 0;
+            const pctPat = Math.min((totalPat / limitePat) * 100, 100) || 0;
 
             const barNec = document.getElementById('bar-db-necesidades');
             barNec.style.width = `${pctNec}%`;
@@ -876,6 +889,10 @@
             const barDes = document.getElementById('bar-db-deseos');
             barDes.style.width = `${pctDes}%`;
             barDes.className = `h-full rounded-full transition-all duration-500 ${totalDes >= limiteDes ? 'bg-red-500' : (totalDes >= limiteDes * 0.8 ? 'bg-amber-500' : 'bg-orange-500')}`;
+
+            const barPat = document.getElementById('bar-db-patrimonio');
+            barPat.style.width = `${pctPat}%`;
+            barPat.className = `h-full rounded-full transition-all duration-500 ${totalPat >= limitePat ? 'bg-red-500' : (totalPat >= limitePat * 0.8 ? 'bg-amber-500' : 'bg-purple-600')}`;
 
             const canvas = document.getElementById('chartCategorias');
             const placeholder = document.getElementById('chart-placeholder');
@@ -902,7 +919,7 @@
                     datasets: [{
                         data: data,
                         backgroundColor: [
-                            '#0d9488', '#3b82f6', '#f97316', '#a855f7', '#ec4899', '#eab308', '#6366f1', '#14b8a6', '#f43f5e', '#a855f7'
+                            '#0d9488', '#3b82f6', '#f97316', '#8b5cf6', '#ec4899', '#eab308', '#6366f1', '#14b8a6', '#f43f5e', '#a855f7', '#06b6d4', '#10b981'
                         ],
                         borderWidth: 1
                     }]
@@ -936,15 +953,15 @@
                 return;
             }
 
-            filtrados.reverse().forEach(g => {
+            filtrados.slice().reverse().forEach(g => {
                 const item = document.createElement('div');
                 item.className = "flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl relative group";
                 
-                const esNec = g.grupo === 'Necesidad';
-                const colorEstilo = esNec ? 'text-blue-600 bg-blue-100' : 'text-orange-600 bg-orange-100';
-                
-                // Buscar ícono dinámico para la categoría o usar uno por defecto
-                const iconoName = iconosCategoria[g.categoria] || (esNec ? 'home' : 'party-popper');
+                let colorEstilo = 'text-blue-600 bg-blue-100';
+                if (g.grupo === 'Deseo') colorEstilo = 'text-orange-600 bg-orange-100';
+                if (g.grupo === 'Patrimonio') colorEstilo = 'text-purple-600 bg-purple-100';
+
+                const iconoName = iconosCategoria[g.categoria] || 'wallet';
 
                 item.innerHTML = `
                     <div class="flex items-center gap-3">
@@ -959,10 +976,10 @@
                     <div class="flex items-center gap-3">
                         <span class="text-sm font-bold text-slate-800">${formatoMoneda.format(g.monto)}</span>
                         <div class="flex items-center gap-1.5">
-                            <button onclick="abrirEditarGasto(${g.id})" class="text-slate-400 hover:text-blue-500 transition-colors p-1" title="Editar gasto">
+                            <button onclick="abrirEditarGasto(${g.id})" class="text-slate-400 hover:text-blue-500 transition-colors p-1" title="Editar">
                                 <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
                             </button>
-                            <button onclick="eliminarGastoParticular(${g.id})" class="text-slate-400 hover:text-red-500 transition-colors p-1" title="Eliminar gasto">
+                            <button onclick="eliminarGastoParticular(${g.id})" class="text-slate-400 hover:text-red-500 transition-colors p-1" title="Eliminar">
                                 <i data-lucide="x" class="w-4 h-4"></i>
                             </button>
                         </div>
@@ -974,7 +991,7 @@
         }
 
         function eliminarGastoParticular(id) {
-            if (confirm("¿Seguro que deseas eliminar este gasto?")) {
+            if (confirm("¿Seguro que deseas eliminar este movimiento?")) {
                 listaGastos = listaGastos.filter(g => g.id !== id);
                 localStorage.setItem('lista_gastos', JSON.stringify(listaGastos));
                 filtrarHistorial();
@@ -983,7 +1000,7 @@
         }
 
         function borrarHistorialCompleto() {
-            if (confirm("¿Estás absolutamente seguro de que deseas vaciar todo tu historial de gastos? Esta acción no se puede deshacer.")) {
+            if (confirm("¿Estás seguro de que deseas vaciar todo tu historial? Esta acción no se puede deshacer.")) {
                 listaGastos = [];
                 localStorage.removeItem('lista_gastos');
                 filtrarHistorial();
@@ -991,7 +1008,7 @@
             }
         }
 
-        // CONTROL DE MODALES DE ALERTA DINÁMICOS
+        // ALERTAS MODALES
         function lanzarAlertaModalConfigurada(titulo, mensaje, tipo) {
             const iconBox = document.getElementById('modal-alerta-icon-box');
             const icon = document.getElementById('modal-alerta-icon');
