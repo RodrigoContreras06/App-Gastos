@@ -170,34 +170,44 @@
             </div>
 
 
-            <!-- ================= PANTALLA 3: DASHBOARD & GRÁFICOS ================= -->
+            <!-- ================= PANTALLA 3: DASHBOARD & GRÁFICOS (FUSIONADO) ================= -->
             <div id="pantalla-dashboard" class="space-y-6 hidden">
-                <!-- VISTA PREVIA Y SELECTOR DE MES/PERÍODO -->
-                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                        <i data-lucide="calendar" class="w-3.5 h-3.5 text-teal-600"></i> Seleccionar Período de Análisis
-                    </label>
-                    <div class="flex gap-2">
-                        <select id="select-mes-dashboard" onchange="actualizarMesDashboard()" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500">
-                            <!-- Se puebla dinámicamente con JS -->
+                
+                <!-- PESTAÑAS DUALES: VISTA TEMPORAL & SELECTOR DE MES -->
+                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-3 shadow-sm">
+                    
+                    <!-- Pestañas Rápidas: Semana, Mes, Año, Todo -->
+                    <div class="flex bg-slate-200 p-1 rounded-xl text-xs font-bold text-slate-600">
+                        <button onclick="cambiarModoDashboard('semana')" id="tab-db-semana" class="flex-1 py-1.5 rounded-lg transition-all text-center">Semana</button>
+                        <button onclick="cambiarModoDashboard('mes')" id="tab-db-mes" class="flex-1 py-1.5 rounded-lg bg-white text-teal-700 shadow-sm transition-all text-center">Mes</button>
+                        <button onclick="cambiarModoDashboard('anio')" id="tab-db-anio" class="flex-1 py-1.5 rounded-lg transition-all text-center">Año</button>
+                        <button onclick="cambiarModoDashboard('todo')" id="tab-db-todo" class="flex-1 py-1.5 rounded-lg transition-all text-center">Todo</button>
+                    </div>
+
+                    <!-- Selector Específico de Mes (Visible principalmente en modo 'Mes') -->
+                    <div id="contenedor-selector-mes" class="flex items-center gap-2 bg-white p-2 rounded-xl border border-slate-200">
+                        <i data-lucide="calendar" class="w-4 h-4 text-teal-600 flex-shrink-0"></i>
+                        <select id="select-mes-dashboard" onchange="renderizarDashboard()" class="w-full bg-transparent text-xs font-bold text-slate-700 focus:outline-none">
+                            <!-- Se puebla dinámicamente -->
                         </select>
                     </div>
                 </div>
 
+                <!-- GRÁFICO PRINCIPAL -->
                 <section class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center">
-                    <h3 class="text-sm font-bold text-slate-600 self-start mb-4 flex items-center gap-2">
+                    <h3 class="text-sm font-bold text-slate-600 self-start mb-4 flex items-center justify-between w-full">
                         <span>Análisis de Distribución</span>
-                        <span id="badge-mes-seleccionado" class="text-[10px] bg-teal-100 text-teal-800 px-2 py-0.5 rounded-full font-bold">Mes</span>
+                        <span id="badge-mes-seleccionado" class="text-[10px] bg-teal-100 text-teal-800 px-2.5 py-1 rounded-full font-bold">Mes</span>
                     </h3>
                     <div class="w-64 h-64">
                         <canvas id="chartCategorias"></canvas>
                     </div>
-                    <div id="chart-placeholder" class="text-xs text-slate-400 py-10 hidden">No hay movimientos registrados en el mes seleccionado.</div>
+                    <div id="chart-placeholder" class="text-xs text-slate-400 py-10 hidden">No hay movimientos registrados en el período seleccionado.</div>
                 </section>
 
-                <!-- BARRAS DE CONTROL POR CADA GRUPO DE PRESUPUESTO -->
+                <!-- BARRAS DE CONTROL DE PRESUPUESTO -->
                 <section class="space-y-3">
-                    <h3 class="text-sm font-bold text-slate-600">Límites por Grupo (Mes Seleccionado)</h3>
+                    <h3 class="text-sm font-bold text-slate-600">Consumo vs Presupuesto Asignado</h3>
                     
                     <div class="bg-slate-50 p-4 rounded-xl border">
                         <div class="flex justify-between text-xs mb-1 font-semibold text-blue-700">
@@ -244,7 +254,7 @@
                         </button>
                     </div>
                     <select id="filtro-rango-historial" onchange="filtrarHistorial()" class="w-full bg-slate-100 border-none rounded-lg p-2.5 text-xs font-bold text-slate-700 focus:outline-none">
-                        <!-- Se puebla dinámicamente con JS con opción de 'Todos' y Meses pasados -->
+                        <!-- Se puebla dinámicamente -->
                     </select>
                 </div>
 
@@ -389,6 +399,7 @@
 
         let listaGastos = JSON.parse(localStorage.getItem('lista_gastos')) || [];
         let listaPrestamos = JSON.parse(localStorage.getItem('lista_prestamos')) || [];
+        let modoDashboard = 'mes'; // Opción activa: 'semana', 'mes', 'anio', 'todo'
         let graficoChart = null;
 
         const formatoMoneda = new Intl.NumberFormat('es-CO', {
@@ -432,7 +443,6 @@
             const hoy = new Date();
             const mesAnioActual = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}`;
 
-            // Coleccionar todos los meses que contienen al menos un gasto
             let mesesSet = new Set();
             mesesSet.add(mesAnioActual);
 
@@ -442,13 +452,12 @@
                 mesesSet.add(clave);
             });
 
-            // Ordenar de más reciente a más antiguo
             const mesesOrdenados = Array.from(mesesSet).sort().reverse();
 
             mesesOrdenados.forEach(clave => {
                 const [anio, mesNum] = clave.split('-');
                 const nombreMes = nombresMeses[parseInt(mesNum) - 1];
-                const etiqueta = `${nombreMes} ${anio} ${clave === mesAnioActual ? '(Mes Actual)' : ''}`;
+                const etiqueta = `${nombreMes} ${anio} ${clave === mesAnioActual ? '(Actual)' : ''}`;
 
                 const optDb = document.createElement('option');
                 optDb.value = clave;
@@ -487,7 +496,7 @@
             } else if (pantalla === 'dashboard') {
                 document.getElementById('pantalla-dashboard').classList.remove('hidden');
                 document.getElementById('nav-dashboard').className = 'flex flex-col items-center gap-1 text-teal-600 font-bold transition-all';
-                document.getElementById('subtitulo-app').innerText = "Análisis mensual detallado";
+                document.getElementById('subtitulo-app').innerText = "Análisis gráfico y porcentajes";
                 renderizarDashboard();
             } else if (pantalla === 'historial') {
                 document.getElementById('pantalla-historial').classList.remove('hidden');
@@ -495,6 +504,159 @@
                 document.getElementById('subtitulo-app').innerText = "Buscador de gastos realizados";
                 filtrarHistorial();
             }
+        }
+
+        // CONTROL DE PESTAÑAS EN DASHBOARD
+        function cambiarModoDashboard(modo) {
+            modoDashboard = modo;
+
+            const tabs = ['semana', 'mes', 'anio', 'todo'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-db-${t}`);
+                if (t === modo) {
+                    btn.className = "flex-1 py-1.5 rounded-lg bg-white text-teal-700 shadow-sm transition-all text-center font-extrabold";
+                } else {
+                    btn.className = "flex-1 py-1.5 rounded-lg transition-all text-center text-slate-500 hover:text-slate-800 font-semibold";
+                }
+            });
+
+            const contenedorSelector = document.getElementById('contenedor-selector-mes');
+            if (modo === 'mes') {
+                contenedorSelector.classList.remove('hidden');
+            } else {
+                contenedorSelector.classList.add('hidden');
+            }
+
+            renderizarDashboard();
+        }
+
+        // RENDERIZADO UNIFICADO DEL DASHBOARD
+        function renderizarDashboard() {
+            const hoy = new Date();
+            let gastosFiltrados = [];
+            let tituloBadge = "";
+            let factorMultiplicadorPresupuesto = 1;
+
+            if (modoDashboard === 'semana') {
+                const haceSieteDias = new Date();
+                haceSieteDias.setDate(hoy.getDate() - 7);
+                
+                gastosFiltrados = listaGastos.filter(g => new Date(g.fecha) >= haceSieteDias);
+                tituloBadge = "Últimos 7 Días";
+                factorMultiplicadorPresupuesto = 0.25; // Aprox 1 semana
+            } else if (modoDashboard === 'mes') {
+                const selectMes = document.getElementById('select-mes-dashboard');
+                const valorMesSeleccionado = selectMes.value || `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}`;
+                const [anioSel, mesSel] = valorMesSeleccionado.split('-').map(Number);
+
+                gastosFiltrados = listaGastos.filter(g => {
+                    const f = new Date(g.fecha);
+                    return f.getFullYear() === anioSel && (f.getMonth() + 1) === mesSel;
+                });
+
+                tituloBadge = `${nombresMeses[mesSel - 1]} ${anioSel}`;
+                factorMultiplicadorPresupuesto = 1;
+            } else if (modoDashboard === 'anio') {
+                const anioActual = hoy.getFullYear();
+                gastosFiltrados = listaGastos.filter(g => new Date(g.fecha).getFullYear() === anioActual);
+                
+                tituloBadge = `Año ${anioActual}`;
+                const mesActualIdx = hoy.getMonth() + 1;
+                factorMultiplicadorPresupuesto = mesActualIdx; // Se multiplica por los meses transcurridos
+            } else if (modoDashboard === 'todo') {
+                gastosFiltrados = [...listaGastos];
+                tituloBadge = "Histórico Completo";
+                factorMultiplicadorPresupuesto = 1; 
+            }
+
+            document.getElementById('badge-mes-seleccionado').innerText = tituloBadge;
+
+            // Calcular Presupuestos escalados según el rango
+            const limiteNec = (config.ingreso * (config.pctNecesidades / 100)) * factorMultiplicadorPresupuesto;
+            const limiteDes = (config.ingreso * (config.pctDeseos / 100)) * factorMultiplicadorPresupuesto;
+            const limitePat = (config.ingreso * ((config.pctPatrimonio || 15) / 100)) * factorMultiplicadorPresupuesto;
+
+            let totalNec = 0, totalDes = 0, totalPat = 0;
+            let categoriaTotales = {};
+
+            gastosFiltrados.forEach(g => {
+                if (g.grupo === 'Necesidad') totalNec += g.monto;
+                if (g.grupo === 'Deseo') totalDes += g.monto;
+                if (g.grupo === 'Patrimonio') totalPat += g.monto;
+
+                categoriaTotales[g.categoria] = (categoriaTotales[g.categoria] || 0) + g.monto;
+            });
+
+            // Actualizar Textos
+            if (modoDashboard === 'todo') {
+                document.getElementById('txt-bar-nec').innerText = `${formatoMoneda.format(totalNec)}`;
+                document.getElementById('txt-bar-des').innerText = `${formatoMoneda.format(totalDes)}`;
+                document.getElementById('txt-bar-pat').innerText = `${formatoMoneda.format(totalPat)}`;
+            } else {
+                document.getElementById('txt-bar-nec').innerText = `${formatoMoneda.format(totalNec)} / ${formatoMoneda.format(limiteNec)}`;
+                document.getElementById('txt-bar-des').innerText = `${formatoMoneda.format(totalDes)} / ${formatoMoneda.format(limiteDes)}`;
+                document.getElementById('txt-bar-pat').innerText = `${formatoMoneda.format(totalPat)} / ${formatoMoneda.format(limitePat)}`;
+            }
+
+            // Actualizar Barras de Progreso
+            const pctNec = Math.min((totalNec / limiteNec) * 100, 100) || 0;
+            const pctDes = Math.min((totalDes / limiteDes) * 100, 100) || 0;
+            const pctPat = Math.min((totalPat / limitePat) * 100, 100) || 0;
+
+            const barNec = document.getElementById('bar-db-necesidades');
+            barNec.style.width = `${pctNec}%`;
+            barNec.className = `h-full rounded-full transition-all duration-500 ${totalNec >= limiteNec ? 'bg-red-500' : 'bg-blue-600'}`;
+
+            const barDes = document.getElementById('bar-db-deseos');
+            barDes.style.width = `${pctDes}%`;
+            barDes.className = `h-full rounded-full transition-all duration-500 ${totalDes >= limiteDes ? 'bg-red-500' : 'bg-orange-500'}`;
+
+            const barPat = document.getElementById('bar-db-patrimonio');
+            barPat.style.width = `${pctPat}%`;
+            barPat.className = `h-full rounded-full transition-all duration-500 ${totalPat >= limitePat ? 'bg-red-500' : 'bg-purple-600'}`;
+
+            // Renderizar Gráfico
+            const canvas = document.getElementById('chartCategorias');
+            const placeholder = document.getElementById('chart-placeholder');
+
+            if (gastosFiltrados.length === 0) {
+                canvas.classList.add('hidden');
+                placeholder.classList.remove('hidden');
+                if (graficoChart) graficoChart.destroy();
+                return;
+            }
+
+            canvas.classList.remove('hidden');
+            placeholder.classList.add('hidden');
+
+            const labels = Object.keys(categoriaTotales);
+            const data = Object.values(categoriaTotales);
+
+            if (graficoChart) graficoChart.destroy();
+
+            graficoChart = new Chart(canvas, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#0d9488', '#3b82f6', '#f97316', '#8b5cf6', '#ec4899', '#eab308', '#6366f1', '#14b8a6', '#f43f5e', '#a855f7', '#06b6d4', '#10b981'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { boxWidth: 12, font: { size: 11 } }
+                        }
+                    }
+                }
+            });
         }
 
         // CONTROL DE CONFIGURACIÓN Y PORCENTAJES
@@ -632,7 +794,7 @@
             } else if (porcentajeGastoRealizado > porcentajeMesTranscurrido + 15) {
                 tipoColor = "amarillo";
                 titulo = "Vas acelerado en el mes";
-                mensaje = `Hoy es el día ${diaDelMes} (${Math.round(porcentajeMesTranscurrido)}% del mes), pero ya has consumido el ${Math.round(porcentajeGastoRealizado)}% de tu presupuesto. Ajusta los gastos de Deseos/Patrimonio los próximos días.`;
+                mensaje = `Hoy es el día ${diaDelMes} (${Math.round(porcentajeMesTranscurrido)}% del mes), pero ya has consumido el ${Math.round(porcentajeGastoRealizado)}% de tu presupuesto. Ajusta tus consumos los próximos días.`;
             } else {
                 tipoColor = "verde";
                 titulo = "¡Excelente control del mes!";
@@ -870,110 +1032,7 @@
             }
         }
 
-        // DASHBOARD POR MES
-        function actualizarMesDashboard() {
-            renderizarDashboard();
-        }
-
-        function renderizarDashboard() {
-            const selectMes = document.getElementById('select-mes-dashboard');
-            const valorMesSeleccionado = selectMes.value; // Formato YYYY-MM
-
-            if (!valorMesSeleccionado) return;
-
-            const [anioSel, mesSel] = valorMesSeleccionado.split('-').map(Number);
-
-            // Actualizar Badge visual
-            const nombreMes = nombresMeses[mesSel - 1];
-            document.getElementById('badge-mes-seleccionado').innerText = `${nombreMes} ${anioSel}`;
-
-            // Filtrar únicamente los gastos que coinciden exactamente en año y mes
-            const gastosFiltrados = listaGastos.filter(g => {
-                const f = new Date(g.fecha);
-                return f.getFullYear() === anioSel && (f.getMonth() + 1) === mesSel;
-            });
-
-            const limiteNec = config.ingreso * (config.pctNecesidades / 100);
-            const limiteDes = config.ingreso * (config.pctDeseos / 100);
-            const limitePat = config.ingreso * ((config.pctPatrimonio || 15) / 100);
-
-            let totalNec = 0;
-            let totalDes = 0;
-            let totalPat = 0;
-            let categoriaTotales = {};
-
-            gastosFiltrados.forEach(g => {
-                if (g.grupo === 'Necesidad') totalNec += g.monto;
-                if (g.grupo === 'Deseo') totalDes += g.monto;
-                if (g.grupo === 'Patrimonio') totalPat += g.monto;
-
-                categoriaTotales[g.categoria] = (categoriaTotales[g.categoria] || 0) + g.monto;
-            });
-
-            document.getElementById('txt-bar-nec').innerText = `${formatoMoneda.format(totalNec)} / ${formatoMoneda.format(limiteNec)}`;
-            document.getElementById('txt-bar-des').innerText = `${formatoMoneda.format(totalDes)} / ${formatoMoneda.format(limiteDes)}`;
-            document.getElementById('txt-bar-pat').innerText = `${formatoMoneda.format(totalPat)} / ${formatoMoneda.format(limitePat)}`;
-
-            const pctNec = Math.min((totalNec / limiteNec) * 100, 100) || 0;
-            const pctDes = Math.min((totalDes / limiteDes) * 100, 100) || 0;
-            const pctPat = Math.min((totalPat / limitePat) * 100, 100) || 0;
-
-            const barNec = document.getElementById('bar-db-necesidades');
-            barNec.style.width = `${pctNec}%`;
-            barNec.className = `h-full rounded-full transition-all duration-500 ${totalNec >= limiteNec ? 'bg-red-500' : (totalNec >= limiteNec * 0.8 ? 'bg-amber-500' : 'bg-blue-600')}`;
-
-            const barDes = document.getElementById('bar-db-deseos');
-            barDes.style.width = `${pctDes}%`;
-            barDes.className = `h-full rounded-full transition-all duration-500 ${totalDes >= limiteDes ? 'bg-red-500' : (totalDes >= limiteDes * 0.8 ? 'bg-amber-500' : 'bg-orange-500')}`;
-
-            const barPat = document.getElementById('bar-db-patrimonio');
-            barPat.style.width = `${pctPat}%`;
-            barPat.className = `h-full rounded-full transition-all duration-500 ${totalPat >= limitePat ? 'bg-red-500' : (totalPat >= limitePat * 0.8 ? 'bg-amber-500' : 'bg-purple-600')}`;
-
-            const canvas = document.getElementById('chartCategorias');
-            const placeholder = document.getElementById('chart-placeholder');
-
-            if (gastosFiltrados.length === 0) {
-                canvas.classList.add('hidden');
-                placeholder.classList.remove('hidden');
-                if (graficoChart) graficoChart.destroy();
-                return;
-            }
-
-            canvas.classList.remove('hidden');
-            placeholder.classList.add('hidden');
-
-            const labels = Object.keys(categoriaTotales);
-            const data = Object.values(categoriaTotales);
-
-            if (graficoChart) graficoChart.destroy();
-
-            graficoChart = new Chart(canvas, {
-                type: 'doughnut',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: [
-                            '#0d9488', '#3b82f6', '#f97316', '#8b5cf6', '#ec4899', '#eab308', '#6366f1', '#14b8a6', '#f43f5e', '#a855f7', '#06b6d4', '#10b981'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: { boxWidth: 12, font: { size: 11 } }
-                        }
-                    }
-                }
-            });
-        }
-
-        // HISTORIAL DETALLADO POR MES
+        // HISTORIAL DETALLADO
         function filtrarHistorial() {
             const filtro = document.getElementById('filtro-rango-historial').value;
             const contenedor = document.getElementById('lista-historial-completo');
